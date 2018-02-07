@@ -6,19 +6,15 @@ defmodule DemoGuardianAuthenticationWeb.Auth do
     user =
       username
       |> Account.get_by()
-  end
+      |> case email_verified() do
+        true ->
+          case check_password_hash(password, password_hash()) do
+            true -> {:ok, user}
+            false -> {:error, :unauthorized}
+          end
 
-  def login_by_username_and_password(username, password) do
-    case username
-         |> Account.get_by() do
-      nil ->
-        {:error, :notfound}
-
-      user ->
-        case user.foo do
-          () ->
-            nil
-        end
-    end
+        _ ->
+          {:error, :unauthorized}
+      end
   end
 end
